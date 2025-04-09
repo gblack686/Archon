@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Data Scientist",
+    "company_name": "Example Tech",
+    "company_url": "https://example.com",
+    "job_url": "https://example.com/careers/data-scientist",
+    "location": "New York, NY",
+    "work_type": "Full-time",
+    "contract_type": "Permanent",
+    "salary": "$120,000 - $150,000",
+    "description": "We are looking for a Data Scientist to join our team. You will build machine learning models and analyze data to help us make better decisions.",
+    "benefits": "Health insurance, 401k, flexible work hours",
+    "published_at": "2023-05-15",
+    "remote": true,
+    "candidate_email": "john.doe@example.com",
+    "scrape_keyword": "data science"
+  },
+  {
+    "title": "Machine Learning Engineer",
+    "company_name": "AI Solutions",
+    "company_url": "https://aisolutions.org",
+    "job_url": "https://aisolutions.org/careers/ml-engineer",
+    "location": "San Francisco, CA",
+    "work_type": "Full-time",
+    "contract_type": "Permanent",
+    "salary": "$140,000 - $180,000",
+    "description": "Join our machine learning team to develop cutting-edge AI solutions for enterprise clients. You'll be working on NLP and computer vision projects.",
+    "benefits": "Comprehensive benefits, stock options, remote work options",
+    "published_at": "2023-05-20",
+    "remote": true,
+    "candidate_email": "jane.smith@example.com",
+    "scrape_keyword": "machine learning"
+  },
+  {
+    "title": "Python Developer",
+    "company_name": "Web Solutions Inc",
+    "company_url": "https://websolutions.net",
+    "job_url": "https://websolutions.net/careers/python-dev",
+    "location": "Chicago, IL",
+    "work_type": "Full-time",
+    "contract_type": "Contract",
+    "salary": "$90,000 - $120,000",
+    "description": "We need a Python developer who is proficient with Django and API development. You'll be working on our backend services.",
+    "benefits": "Health insurance, 401k, flexible scheduling",
+    "published_at": "2023-05-25",
+    "remote": false,
+    "candidate_email": "john.doe@example.com",
+    "scrape_keyword": "python developer"
+  }
+] 
