@@ -7,6 +7,7 @@ import os
 from .job_upload_routes import router as job_upload_router
 from .job_similarity_routes import router as similarity_router
 from .apify_routes import router as apify_router
+from .workflow_routes import router as workflow_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -28,6 +29,7 @@ app.add_middleware(
 app.include_router(job_upload_router, prefix="/api/jobs", tags=["Job Uploads"])
 app.include_router(similarity_router, prefix="/api/similarity", tags=["Job Similarity"])
 app.include_router(apify_router, prefix="/api/apify", tags=["Apify Integration"])
+app.include_router(workflow_router, prefix="/api/workflows", tags=["Deterministic Workflows"])
 
 @app.get("/")
 async def root():
