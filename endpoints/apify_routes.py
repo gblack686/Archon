@@ -45,7 +45,7 @@ async def upload_apify_runs(
     try:
         # Use provided API token or get from environment
         if not apify_api_token:
-            apify_api_token = os.getenv('APIFY_API_TOKEN')
+            apify_api_token = os.getenv('APIFY_TOKEN')
             if not apify_api_token:
                 return JSONResponse(
                     status_code=400,

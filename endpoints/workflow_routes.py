@@ -105,146 +105,65 @@ async def run_daily_scrape_workflow(
     apify_api_token: Optional[str] = None
 ):
     """
-    Run the daily scrape workflow (called by background task).
-    """
-    workflow_start_time = time.time()
-    workflow_results = {
-        "workflow_name": "daily-scrape",
-        "start_time": datetime.now().isoformat(),
-        "steps": [],
-        "total_jobs_found": 0
-    }
+    Run the daily scrape workflow to process job listings
     
+    - **num_apify_runs**: Number of recent runs to process (default: 20)
+    - **apify_items_per_run**: Maximum number of items to fetch per run (default: 100)
+    - **apify_api_token**: Apify API token (optional, will use environment variable if not provided)
+    """
     try:
-        # Step 1: Get Supabase client
+        # Use provided API token or get from environment
+        if not apify_api_token:
+            apify_api_token = os.getenv('APIFY_TOKEN')
+            if not apify_api_token:
+                return JSONResponse(
+                    status_code=400,
+                    content={"success": False, "message": "Apify API token is required"}
+                )
+        
+        # Initialize clients
         supabase_client = await init_similarity_client()
         if not supabase_client:
-            workflow_results["status"] = "FAILED"
-            workflow_results["error"] = "Failed to initialize Supabase client"
-            return workflow_results
-        
-        # Step 2: Scrape Referral Buddy job board URLs from Supabase
-        step_start = time.time()
-        try:
-            query = supabase_client.table("referral_buddy_job_board_urls").select("*").execute()
-            referral_urls = query.data if hasattr(query, 'data') else []
-            
-            step_result = {
-                "step": "scrape-referral-buddy",
-                "status": "COMPLETED",
-                "duration_seconds": round(time.time() - step_start, 2),
-                "urls_found": len(referral_urls)
-            }
-            workflow_results["steps"].append(step_result)
-            
-            # Log URLs found for debugging
-            print(f"Found {len(referral_urls)} referral buddy URLs")
-            
-        except Exception as e:
-            step_result = {
-                "step": "scrape-referral-buddy",
-                "status": "FAILED",
-                "duration_seconds": round(time.time() - step_start, 2),
-                "error": str(e)
-            }
-            workflow_results["steps"].append(step_result)
-        
-        # Step 3: Scrape LinkedIn jobs via Apify and store in Supabase
-        step_start = time.time()
-        try:
-            # Use provided API token or get from environment
-            if not apify_api_token:
-                apify_api_token = os.getenv('APIFY_API_TOKEN')
-            
-            if not apify_api_token:
-                raise ValueError("Apify API token is required but not provided")
-            
-            # Initialize clients
-            supabase_client = await init_apify_client()
-            openai_client = await init_openai_client()
-            
-            # Create context with dependencies
-            async with httpx.AsyncClient() as client:
-                deps = Deps(
-                    client=client,
-                    apify_api_token=apify_api_token,
-                    supabase_client=supabase_client,
-                    openai_client=openai_client
-                )
-                
-                # Create a simple RunContext-like object
-                class RunContext:
-                    def __init__(self, deps):
-                        self.deps = deps
-                
-                ctx = RunContext(deps)
-                
-                # Call the upload function
-                result = await upload_apify_runs_to_supabase(
-                    ctx,
-                    num_runs=num_apify_runs,
-                    items_per_run=apify_items_per_run
-                )
-                
-                # Parse result to extract job count
-                import re
-                job_count_match = re.search(r"Total jobs uploaded: (\d+)", result)
-                job_count = int(job_count_match.group(1)) if job_count_match else 0
-                
-                step_result = {
-                    "step": "scrape-apify-linkedin",
-                    "status": "COMPLETED",
-                    "duration_seconds": round(time.time() - step_start, 2),
-                    "result_summary": result.split("\n")[0] if isinstance(result, str) else str(result),
-                    "jobs_uploaded": job_count
-                }
-                workflow_results["total_jobs_found"] += job_count
-                
-            workflow_results["steps"].append(step_result)
-            
-        except Exception as e:
-            step_result = {
-                "step": "scrape-apify-linkedin",
-                "status": "FAILED",
-                "duration_seconds": round(time.time() - step_start, 2),
-                "error": str(e)
-            }
-            workflow_results["steps"].append(step_result)
-        
-        # Set overall workflow status
-        all_steps_completed = all(step["status"] == "COMPLETED" for step in workflow_results["steps"])
-        workflow_results["status"] = "COMPLETED" if all_steps_completed else "PARTIAL"
-        workflow_results["duration_seconds"] = round(time.time() - workflow_start_time, 2)
-        workflow_results["end_time"] = datetime.now().isoformat()
-        
-        # Log workflow completion
-        await log_workflow_execution(
-            supabase_client, 
-            "daily-scrape", 
-            workflow_results["status"], 
-            workflow_results
-        )
-        
-        return workflow_results
-        
-    except Exception as e:
-        workflow_results["status"] = "FAILED"
-        workflow_results["error"] = str(e)
-        workflow_results["duration_seconds"] = round(time.time() - workflow_start_time, 2)
-        workflow_results["end_time"] = datetime.now().isoformat()
-        
-        # Try to log workflow failure
-        try:
-            await log_workflow_execution(
-                supabase_client if 'supabase_client' in locals() else await init_similarity_client(), 
-                "daily-scrape", 
-                "FAILED", 
-                workflow_results
+            return JSONResponse(
+                status_code=500,
+                content={"success": False, "message": "Failed to initialize Supabase client"}
             )
-        except:
-            pass
+        
+        openai_client = await init_openai_client()
+        
+        # Create context with dependencies
+        async with httpx.AsyncClient() as client:
+            deps = Deps(
+                client=client,
+                apify_api_token=apify_api_token,
+                supabase_client=supabase_client,
+                openai_client=openai_client
+            )
             
-        return workflow_results
+            # Create a simple RunContext-like object
+            class RunContext:
+                def __init__(self, deps):
+                    self.deps = deps
+            
+            ctx = RunContext(deps)
+            
+            # Run the workflow
+            result = await upload_apify_runs_to_supabase(
+                ctx,
+                num_runs=num_apify_runs,
+                items_per_run=apify_items_per_run
+            )
+            
+            return {
+                "success": True,
+                "message": "Daily scrape workflow completed",
+                "result": result
+            }
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "message": f"Server error: {str(e)}"}
+        )
 
 # ============================================================
 # Workflow 2: Gmail Inbox Scanner (Hourly) - PLACEHOLDER
