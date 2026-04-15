@@ -174,16 +174,20 @@ export function Sidebar(): React.ReactElement {
 
   return (
     <aside
-      className="relative flex h-full flex-col border-r border-border bg-surface"
+      className="glass-panel relative z-10 flex h-full flex-col border-y-0 border-l-0 border-r border-border"
       style={{ width: `${String(width)}px` }}
     >
-      {/* Logo */}
+      {/* Brand mark — GB signature with terracotta halo */}
       <div className="flex flex-col gap-3 p-4">
-        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-semibold text-primary-foreground">A</span>
+        <Link to="/" className="hover-mini flex items-center" aria-label="GB Automation">
+          <div className="relative flex h-11 w-11 items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-[#D97757]/25 blur-lg" />
+            <img
+              src="/gb-logo.png"
+              alt="GB Automation"
+              className="relative z-10 h-11 w-11 object-contain"
+            />
           </div>
-          <span className="text-base font-semibold text-text-primary">Archon</span>
         </Link>
       </div>
 
@@ -203,9 +207,9 @@ export function Sidebar(): React.ReactElement {
       <div className="px-3 pb-2">
         <button
           onClick={handleNewOrchestratorChat}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors"
+          className="hover-shiny flex w-full items-center gap-2 rounded-full border border-border bg-white/60 px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-text-primary transition-colors"
         >
-          <MessageSquarePlus className="h-4 w-4 shrink-0" />
+          <MessageSquarePlus className="h-4 w-4 shrink-0 text-[#D97757]" />
           New Chat
         </button>
       </div>

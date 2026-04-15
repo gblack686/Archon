@@ -1,6 +1,6 @@
 import { NavLink, Link } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { LayoutDashboard, MessageSquare, Workflow, Settings } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Workflow, Settings, BookOpen } from 'lucide-react';
 import { listWorkflowRuns, getUpdateCheck } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +8,7 @@ const tabs = [
   { to: '/chat', end: false, icon: MessageSquare, label: 'Chat' },
   { to: '/dashboard', end: true, icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/workflows', end: false, icon: Workflow, label: 'Workflows' },
+  { to: '/library', end: true, icon: BookOpen, label: 'Library' },
   { to: '/settings', end: false, icon: Settings, label: 'Settings' },
 ] as const;
 
@@ -28,13 +29,21 @@ export function TopNav(): React.ReactElement {
   });
 
   return (
-    <nav className="flex items-center gap-1 border-b border-border bg-surface px-4">
-      {/* Brand logo */}
-      <Link to="/chat" className="flex items-center gap-2 mr-4 hover:opacity-80 transition-opacity">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary">
-          <span className="text-sm font-semibold text-primary-foreground">A</span>
+    <nav className="glass-panel relative z-20 flex items-center gap-1 border-x-0 border-t-0 border-b border-border px-4">
+      {/* Brand mark — GB signature with terracotta halo */}
+      <Link
+        to="/chat"
+        className="hover-mini mr-6 flex items-center py-2"
+        aria-label="GB Automation"
+      >
+        <div className="relative flex h-9 w-9 items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-[#D97757]/25 blur-lg" />
+          <img
+            src="/gb-logo.png"
+            alt="GB Automation"
+            className="relative z-10 h-9 w-9 object-contain"
+          />
         </div>
-        <span className="text-sm font-semibold text-text-primary">Archon</span>
       </Link>
 
       {tabs.map(({ to, end, icon: Icon, label }) => (
@@ -44,10 +53,10 @@ export function TopNav(): React.ReactElement {
           end={end}
           className={({ isActive }: { isActive: boolean }): string =>
             cn(
-              'flex items-center gap-2 px-3 py-3 text-sm font-medium border-b-2 transition-colors',
+              'hover-mini flex items-center gap-2 px-3 py-3 text-[11px] font-medium uppercase tracking-widest border-b-2 transition-colors',
               isActive
                 ? 'border-primary text-primary'
-                : 'border-transparent text-text-secondary hover:text-text-primary'
+                : 'border-transparent text-text-tertiary hover:text-primary'
             )
           }
         >
@@ -58,14 +67,14 @@ export function TopNav(): React.ReactElement {
           )}
         </NavLink>
       ))}
-      <span className="ml-auto text-xs text-text-secondary">
+      <span className="ml-auto text-[10px] uppercase tracking-widest text-text-tertiary">
         v{import.meta.env.VITE_APP_VERSION as string}
         {updateCheck?.updateAvailable && updateCheck.releaseUrl && (
           <a
             href={updateCheck.releaseUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1.5 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            className="ml-1.5 inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
             title={`v${updateCheck.latestVersion} available`}
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />v
