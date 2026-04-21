@@ -3,6 +3,7 @@
  */
 import { pool, getDialect } from './connection';
 import { createLogger } from '@archon/paths';
+import { scheduleArchive } from '../services/session-archiver';
 
 /** Lazy-initialized logger (deferred so test mocks can intercept createLogger) */
 let cachedLog: ReturnType<typeof createLogger> | undefined;
@@ -44,6 +45,7 @@ export async function addMessage(
     );
   }
   getLog().debug({ conversationId, role, messageId: row.id }, 'db.message_persist_completed');
+  scheduleArchive(conversationId);
   return row;
 }
 
